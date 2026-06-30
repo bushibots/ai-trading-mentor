@@ -360,8 +360,8 @@ function renderAnalysisResults(data) {
         </ul>
       </div>
 
-      <!-- Bull / Bear side-by-side -->
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
+      <!-- Bull / Bear side-by-side (Stacked for narrow column) -->
+      <div style="display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 24px;">
         <div class="card" style="padding: 16px; background-color: var(--bg-primary);">
           <h4 style="font-family: var(--font-display); margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">🟢 Bullish Factors</h4>
           <ul style="list-style: none; font-size: 0.9rem;">

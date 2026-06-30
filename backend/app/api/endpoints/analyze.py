@@ -127,7 +127,10 @@ async def analyze_chart(
             reason="; ".join(response_data.reasons),
             educational_concepts=json.dumps([e.model_dump() for e in edu_explanations]),
             bull_factors=json.dumps(response_data.bull_factors),
-            bear_factors=json.dumps(response_data.bear_factors)
+            bear_factors=json.dumps(response_data.bear_factors),
+            entry_price=response_data.current_price,
+            target=response_data.target,
+            stop_loss=response_data.stop_loss
         )
         db.add(new_trade)
         db.commit()

@@ -33,7 +33,10 @@ class Trade(Base):
     bear_factors = Column(Text) # JSON string
     
     # Outcome tracking
-    outcome = Column(String, nullable=True) # e.g. "WIN", "LOSS", "BREAK_EVEN"
+    entry_price = Column(Float, nullable=True)
+    target = Column(Float, nullable=True)
+    stop_loss = Column(Float, nullable=True)
+    outcome = Column(String, default="PENDING") # e.g. "PENDING", "WIN", "LOSS", "BREAK_EVEN"
     
     review = relationship("TradeReview", back_populates="trade", uselist=False)
 

@@ -1,6 +1,6 @@
 import './style.css';
 
-const API_BASE = 'http://127.0.0.1:8000/api/v1';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api/v1';
 
 // Application State
 const state = {
@@ -430,8 +430,16 @@ function renderJournalGrid() {
   journalList.innerHTML = filtered.map(trade => {
       const date = new Date(trade.timestamp).toLocaleString();
       const signalClass = trade.decision.toLowerCase();
-      const outcomeText = trade.outcome || 'Awaiting Review';
+      const outcome = trade.outcome || 'PENDING';
+      const outcomeClass = 'badge-' + outcome.toLowerCase();
       
+      let reviewButton = '';
+      if (outcome === 'PENDING') {
+        reviewButton = `<button class="btn-primary" style="width: 100%; padding: 8px; font-size: 0.9rem;" onclick="openReviewModal(${trade.id})">Log Outcome</button>`;
+      } else {
+        reviewButton = `<button class="btn-secondary" style="width: 100%; padding: 8px; font-size: 0.9rem;" disabled>Reviewed (${outcome})</button>`;
+      }
+
       return `
         <div class="card" style="background-color: var(--bg-primary); border: 1px solid var(--border-color); padding: 16px; border-radius: var(--radius-md);">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
@@ -439,16 +447,24 @@ function renderJournalGrid() {
               <div style="font-family: var(--font-display); font-size: 1.2rem; font-weight: 600;">${trade.asset}</div>
               <div style="font-size: 0.8rem; color: var(--text-muted);">${date} • ${trade.timeframe}</div>
             </div>
-            <span class="badge-status ${signalClass}">${trade.decision}</span>
+            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+                <span class="badge-status ${signalClass}">${trade.decision}</span>
+                <span class="badge ${outcomeClass}">${outcome}</span>
+            </div>
           </div>
           
-          <div style="margin-bottom: 16px;">
-            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 4px;">
-              <span style="color: var(--text-secondary);">Confidence</span>
-              <span style="color: var(--text-primary); font-weight: 600;">${trade.confidence}%</span>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 16px; font-size: 0.85rem; text-align: center;">
+            <div style="background: var(--bg-secondary); padding: 8px; border-radius: 4px;">
+                <div style="color: var(--text-muted); margin-bottom: 2px;">Entry</div>
+                <div style="font-weight: 600;">${trade.entry_price ? trade.entry_price.toFixed(5) : '-'}</div>
             </div>
-            <div style="width: 100%; height: 6px; background-color: var(--bg-tertiary); border-radius: 4px; overflow: hidden;">
-              <div style="width: ${trade.confidence}%; height: 100%; background: var(--color-brand);"></div>
+            <div style="background: rgba(46, 204, 113, 0.1); padding: 8px; border-radius: 4px;">
+                <div style="color: var(--text-muted); margin-bottom: 2px;">Target</div>
+                <div style="color: var(--color-bull); font-weight: 600;">${trade.target ? trade.target.toFixed(5) : '-'}</div>
+            </div>
+            <div style="background: rgba(231, 76, 60, 0.1); padding: 8px; border-radius: 4px;">
+                <div style="color: var(--text-muted); margin-bottom: 2px;">Stop Loss</div>
+                <div style="color: var(--color-bear); font-weight: 600;">${trade.stop_loss ? trade.stop_loss.toFixed(5) : '-'}</div>
             </div>
           </div>
           
@@ -456,11 +472,75 @@ function renderJournalGrid() {
             <strong style="color: var(--text-primary);">Reason:</strong> ${trade.reason}
           </div>
           
-          <button class="btn-primary" style="width: 100%; padding: 8px; font-size: 0.9rem;" onclick="alert('Trade Outcome Logging coming soon!')">Review Trade</button>
+          ${reviewButton}
         </div>
       `;
     }).join('');
 }
+
+// Modal Logic
+let currentReviewTradeId = null;
+
+window.openReviewModal = function(tradeId) {
+  currentReviewTradeId = tradeId;
+  document.getElementById('review-trade-id').textContent = tradeId;
+  document.getElementById('review-result').value = 'WIN';
+  document.getElementById('review-succeeded').value = '';
+  document.getElementById('review-failed').value = '';
+  document.getElementById('review-lessons').value = '';
+  document.getElementById('review-modal').style.display = 'flex';
+};
+
+window.closeReviewModal = function() {
+  document.getElementById('review-modal').style.display = 'none';
+  currentReviewTradeId = null;
+};
+
+document.getElementById('cancel-review-btn').addEventListener('click', closeReviewModal);
+
+document.getElementById('submit-review-btn').addEventListener('click', async () => {
+  if (!currentReviewTradeId) return;
+  
+  const result = document.getElementById('review-result').value;
+  const why_succeeded = document.getElementById('review-succeeded').value;
+  const why_failed = document.getElementById('review-failed').value;
+  const lessons_learned = document.getElementById('review-lessons').value;
+  
+  const payload = {
+      trade_id: currentReviewTradeId,
+      result: result,
+      why_succeeded: why_succeeded,
+      why_failed: why_failed,
+      lessons_learned: lessons_learned,
+      patterns_worked: [],
+      patterns_failed: []
+  };
+  
+  const btn = document.getElementById('submit-review-btn');
+  btn.textContent = "Saving...";
+  btn.disabled = true;
+  
+  try {
+      const res = await fetch(`${API_BASE}/journal/${currentReviewTradeId}/review`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+      });
+      
+      if (!res.ok) {
+          const errData = await res.json();
+          throw new Error(errData.detail || "Failed to save review");
+      }
+      
+      closeReviewModal();
+      await fetchJournal(); // Refresh
+  } catch (err) {
+      alert("Error: " + err.message);
+  } finally {
+      btn.textContent = "Save Review";
+      btn.disabled = false;
+  }
+});
 
 // Fetch Trade Journal entries
 async function fetchJournal() {

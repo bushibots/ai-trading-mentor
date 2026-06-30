@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     
     # Security / Database
-    SQLALCHEMY_DATABASE_URI: str = "sqlite:///./trading_mentor.db"
+    SQLALCHEMY_DATABASE_URI: str = "sqlite:///./trading_mentor_v2.db"
     
     # AI Providers
     GEMINI_API_KEYS: Optional[str] = None

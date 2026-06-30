@@ -37,7 +37,11 @@ class MarketDataService:
             'Referer': 'https://finance.yahoo.com/'
         })
         
-        df = yf.download(ticker, period=period, interval=interval, progress=False, session=session)
+        try:
+            df = yf.download(ticker, period=period, interval=interval, progress=False, session=session)
+        except Exception as yf_err:
+            print(f"yfinance download failed: {yf_err}")
+            df = pd.DataFrame()
         
         if df.empty and "-USD" in ticker:
             try:

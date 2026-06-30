@@ -1,0 +1,14 @@
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+SQLAlchemy
+python-dotenv
+python-multipart
+google-generativeai
+pillow
+pandas
+pytest
+pytest-asyncio
+yfinance
+mplfinance

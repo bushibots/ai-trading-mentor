@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.venv/
+
+# Environment Variables (CRITICAL)
+.env
+.env.*
+
+# Database
+*.db
+*.sqlite3
+trading_mentor.db
+
+# Testing
+.pytest_cache/
+
+# IDE
+.vscode/
+.idea/

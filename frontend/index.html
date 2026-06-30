@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Trading Mentor</title>
+  </head>
+  <body>
+    <div id="app">
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <div class="logo-container">
+          <div class="logo-text">
+            <span>⚡ AI Trading Mentor</span>
+          </div>
+        </div>
+        <nav class="nav-menu">
+          <a class="nav-item active" data-view="dashboard">
+            <span>📊</span> Dashboard
+          </a>
+          <a class="nav-item" data-view="journal">
+            <span>📓</span> Trade Journal
+          </a>
+          <a class="nav-item" data-view="library">
+            <span>📚</span> Edu Library
+          </a>
+          <a class="nav-item" data-view="stats">
+            <span>📈</span> Statistics
+          </a>
+        </nav>
+      </aside>
+
+      <!-- Main Shell -->
+      <main class="main-wrapper">
+        <header class="top-bar">
+          <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+          <h1 class="view-title" id="view-title">Dashboard</h1>
+          <div class="user-status" style="font-size: 0.9rem; color: var(--text-secondary);">
+            Student Account • Live
+          </div>
+        </header>
+
+        <div class="content-container">
+          
+          <!-- View 1: Dashboard -->
+          <section id="view-dashboard" class="view-panel active">
+            <div class="dashboard-grid">
+              
+              <!-- Left Column: Form Upload -->
+              <div class="card analysis-form-card">
+                <h2 class="card-title">🔍 New Chart Analysis</h2>
+                <form id="analysis-form">
+                  <div class="form-group">
+                    <label class="form-label" for="asset-input">Search Asset / Ticker</label>
+                    <input type="text" id="asset-input" class="form-control" list="asset-options" placeholder="Search or type ticker (e.g. BTC-USD, AAPL)..." autocomplete="off" required>
+                    <datalist id="asset-options">
+                      <!-- Crypto -->
+                      <option value="BTC-USD">Bitcoin (BTC-USD)</option>
+                      <option value="ETH-USD">Ethereum (ETH-USD)</option>
+                      <option value="SOL-USD">Solana (SOL-USD)</option>
+                      <option value="BNB-USD">BNB (BNB-USD)</option>
+                      <option value="XRP-USD">Ripple (XRP-USD)</option>
+                      <option value="ADA-USD">Cardano (ADA-USD)</option>
+                      <option value="DOGE-USD">Dogecoin (DOGE-USD)</option>
+                      <!-- Stocks -->
+                      <option value="AAPL">Apple Inc. (AAPL)</option>
+                      <option value="TSLA">Tesla Inc. (TSLA)</option>
+                      <option value="NVDA">NVIDIA Corp. (NVDA)</option>
+                      <option value="MSFT">Microsoft Corp. (MSFT)</option>
+                      <option value="AMZN">Amazon.com Inc. (AMZN)</option>
+                      <option value="GOOGL">Alphabet Inc. (GOOGL)</option>
+                      <option value="META">Meta Platforms (META)</option>
+                      <option value="NFLX">Netflix Inc. (NFLX)</option>
+                      <option value="AMD">Advanced Micro Devices (AMD)</option>
+                      <!-- Indices -->
+                      <option value="SPY">S&P 500 ETF (SPY)</option>
+                      <option value="QQQ">Nasdaq 100 ETF (QQQ)</option>
+                      <option value="DIA">Dow Jones ETF (DIA)</option>
+                      <!-- Forex -->
+                      <option value="EURUSD=X">EUR/USD Forex</option>
+                      <option value="GBPUSD=X">GBP/USD Forex</option>
+                      <option value="USDJPY=X">USD/JPY Forex</option>
+                      <option value="AUDUSD=X">AUD/USD Forex</option>
+                      <!-- Commodities -->
+                      <option value="GC=F">Gold Futures</option>
+                      <option value="CL=F">Crude Oil Futures</option>
+                      <option value="SI=F">Silver Futures</option>
+                    </datalist>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label class="form-label" for="timeframe-input">Timeframe</label>
+                    <select id="timeframe-input" class="form-control">
+                      <option value="15m">15m (Momentum-focused)</option>
+                      <option value="30m">30m</option>
+                      <option value="1h" selected>1h</option>
+                      <option value="4h">4h</option>
+                      <option value="12h">12h</option>
+                      <option value="24h">24h (Structure-focused)</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="position-input">Position Size ($)</label>
+                    <input type="number" id="position-input" class="form-control" placeholder="e.g., 1000" value="1000">
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="user-notes-input">User Context / Notes (Optional)</label>
+                    <textarea id="user-notes-input" class="form-control" rows="2" placeholder="e.g., 'Expecting a breakout due to upcoming news...' or 'I'm feeling bearish here.'"></textarea>
+                  </div>
+
+                  <!-- Live Chart Preview -->
+                  <div class="form-group">
+                    <label class="form-label">Live Market Chart (Preview)</label>
+                    <div id="tv-widget-container" style="height: 250px; width: 100%; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-color); background: var(--bg-tertiary);"></div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 6px;">The backend will automatically fetch this OHLCV data, plot it, and analyze it.</div>
+                  </div>
+
+                  <button type="submit" class="btn-primary" id="submit-btn">Run Analysis</button>
+                </form>
+              </div>
+
+              <!-- Right Column: Analysis Output -->
+              <div class="card analysis-results-card" id="results-panel">
+                <div style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: var(--text-secondary); padding: 40px 0;">
+                  <div style="font-size: 3rem; margin-bottom: 16px;">📊</div>
+                  <h3>Awaiting Chart Upload</h3>
+                  <p style="margin-top: 8px; font-size: 0.9rem; color: var(--text-muted);">Fill in the options, upload a chart screenshot, and press 'Run Analysis' to see AI findings here.</p>
+                </div>
+              </div>
+
+            </div>
+          </section>
+
+          <!-- View 2: Trade Journal -->
+          <section id="view-journal" class="view-panel">
+            <div class="card">
+              <h2 class="card-title">📓 Trade Journal</h2>
+              <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.95rem;">
+                All trade ideas analyzed by the AI mentor are stored here. Review your history and track outcomes.
+              </p>
+              
+              <div style="display: flex; gap: 16px; margin-bottom: 24px;">
+                <div style="flex: 1;">
+                  <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Filter by Asset</label>
+                  <select id="journal-asset-filter" class="form-control" style="padding: 8px;">
+                    <option value="ALL">All Assets</option>
+                  </select>
+                </div>
+                <div style="flex: 1;">
+                  <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Filter by Signal</label>
+                  <select id="journal-signal-filter" class="form-control" style="padding: 8px;">
+                    <option value="ALL">All Signals</option>
+                    <option value="BUY">BUY</option>
+                    <option value="SELL">SELL</option>
+                    <option value="HOLD">HOLD</option>
+                    <option value="WAIT">WAIT</option>
+                    <option value="CONFLICT">CONFLICT</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div class="journal-grid" id="journal-list">
+                <!-- Dynamic -->
+              </div>
+            </div>
+          </section>
+
+          <!-- View 3: Educational Library -->
+          <section id="view-library" class="view-panel">
+            <!-- Foundational Trading Hub -->
+            <div class="card" style="margin-bottom: 24px;">
+              <h2 class="card-title">📖 Foundational Trading Hub</h2>
+              <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 20px;">
+                Master the core mechanics of trading. These static modules cover the fundamental concepts required before risking real capital.
+              </p>
+              <div class="edu-static-grid">
+                <!-- Static Card 1 -->
+                <div class="edu-card-static">
+                  <div class="edu-card-icon">🧠</div>
+                  <h4 style="margin-bottom: 8px; color: var(--color-brand); font-family: var(--font-display);">How to Analyze a Chart</h4>
+                  <p style="font-size: 0.9rem; line-height: 1.5; color: var(--text-primary);"><strong>1.</strong> Start on a high timeframe (1D/4H) to find the macro trend.<br><strong>2.</strong> Identify key Support/Resistance zones.<br><strong>3.</strong> Zoom into lower timeframes (1H/15m) for entry triggers.</p>
+                </div>
+                <!-- Static Card 2 -->
+                <div class="edu-card-static">
+                  <div class="edu-card-icon">🕯️</div>
+                  <h4 style="margin-bottom: 8px; color: var(--color-brand); font-family: var(--font-display);">Top Candlestick Patterns</h4>
+                  <p style="font-size: 0.9rem; line-height: 1.5; color: var(--text-primary);"><strong>Engulfing:</strong> Strong reversal signal where a candle fully covers the previous body.<br><strong>Doji:</strong> Market indecision. Wait for the next candle to confirm direction.</p>
+                </div>
+                <!-- Static Card 3 -->
+                <div class="edu-card-static">
+                  <div class="edu-card-icon">📉</div>
+                  <h4 style="margin-bottom: 8px; color: var(--color-brand); font-family: var(--font-display);">Understanding RSI & MACD</h4>
+                  <p style="font-size: 0.9rem; line-height: 1.5; color: var(--text-primary);"><strong>RSI:</strong> &gt;70 is overbought, &lt;30 is oversold.<br><strong>MACD:</strong> Crosses indicate momentum shifts. Divergences warn of reversals.</p>
+                </div>
+                <!-- Static Card 4 -->
+                <div class="edu-card-static">
+                  <div class="edu-card-icon">🛡️</div>
+                  <h4 style="margin-bottom: 8px; color: var(--color-brand); font-family: var(--font-display);">Risk Management 101</h4>
+                  <p style="font-size: 0.9rem; line-height: 1.5; color: var(--text-primary);">Never risk more than 1-2% of your total capital on a single trade. Always aim for a Risk/Reward ratio of at least 1:2. Set strict Stop Losses and stick to them.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="card" style="margin-bottom: 24px;">
+              <h2 class="card-title">🤖 AI Mentorship History</h2>
+              <p style="color: var(--text-secondary); font-size: 0.95rem;">
+                Dynamic concepts your AI Mentor has taught you based on your personal chart history. Learn the patterns and indicators used in your actual trades.
+              </p>
+            </div>
+            
+            <div class="edu-grid" id="library-list">
+              <!-- Dynamic concepts -->
+            </div>
+          </section>
+
+          <!-- View 4: Statistics -->
+          <section id="view-stats" class="view-panel">
+            <div class="stats-grid">
+              
+              <div class="card kpi-card">
+                <div style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Total Charts Analyzed</div>
+                <div class="kpi-value" id="stats-total">0</div>
+              </div>
+              
+              <div class="card kpi-card">
+                <div style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Overall Win Rate</div>
+                <div class="kpi-value" id="stats-winrate">N/A</div>
+              </div>
+              
+              <div class="card kpi-card">
+                <div style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Best Timeframe</div>
+                <div class="kpi-value" id="stats-best-timeframe">N/A</div>
+              </div>
+
+              <div class="card kpi-card">
+                <div style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Accuracy Score</div>
+                <div class="kpi-value" id="stats-accuracy">N/A</div>
+              </div>
+
+              <div class="card stats-card-full">
+                <h2 class="card-title">📈 Metric Breakdown</h2>
+                <div id="stats-breakdown-details" style="color: var(--text-secondary); font-size: 0.95rem;">
+                  <!-- Stats explanation -->
+                  No stats available yet. Complete analyses and log outcomes in your Trade Journal to populate performance metrics!
+                </div>
+              </div>
+
+            </div>
+          </section>
+
+        </div>
+      </main>
+    </div>
+    
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

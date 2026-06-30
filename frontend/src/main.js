@@ -168,8 +168,10 @@ analysisForm.addEventListener('submit', async (e) => {
 
   resultsPanel.innerHTML = `
     <div style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 40px 0;">
-      <div class="loader" style="font-size: 2.5rem; animation: spin 1.5s linear infinite;">⏳</div>
-      <h3 style="margin-top: 16px;">AI Mentor is Analyzing Your Chart</h3>
+      <svg class="spinner" width="48px" height="48px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+         <circle class="path" fill="none" stroke="var(--color-brand)" stroke-width="4" stroke-linecap="round" cx="33" cy="33" r="30"></circle>
+      </svg>
+      <h3 style="margin-top: 24px; font-weight: 600;">AI Mentor is Analyzing Your Chart</h3>
       <p style="margin-top: 8px; font-size: 0.9rem; color: var(--text-muted);">This performs local computations first, then requests structured insights from the AI.</p>
     </div>
   `;

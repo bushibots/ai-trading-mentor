@@ -85,9 +85,11 @@ navItems.forEach(item => {
 });
 
 // Mobile Sidebar Toggle
-sidebarToggle.addEventListener('click', () => {
-  sidebar.classList.toggle('active');
-});
+if (sidebarToggle) {
+  sidebarToggle.addEventListener('click', () => {
+    sidebar.classList.toggle('active');
+  });
+}
 
 // TradingView Widget Loader
 let tvWidget = null;

@@ -39,6 +39,39 @@ class MarketDataService:
         
         df = yf.download(ticker, period=period, interval=interval, progress=False, session=session)
         
+        if df.empty and "-USD" in ticker:
+            try:
+                # Fallback to Coinbase API for Crypto (which doesn't block Render IP addresses)
+                cb_timeframe_map = {
+                    "15m": 900,
+                    "30m": 900,
+                    "1h": 3600,
+                    "4h": 3600,
+                    "12h": 21600,
+                    "24h": 86400
+                }
+                granularity = cb_timeframe_map.get(timeframe, 86400)
+                cb_url = f"https://api.exchange.coinbase.com/products/{ticker}/candles?granularity={granularity}"
+                res = requests.get(cb_url, headers={"User-Agent": "Mozilla/5.0"})
+                if res.ok:
+                    data = res.json()
+                    if data and isinstance(data, list):
+                        # Coinbase returns: [ [ time, low, high, open, close, volume ], ... ] (newest first)
+                        data.reverse() # Convert to ascending (oldest first)
+                        df_cb = pd.DataFrame(data, columns=['time', 'low', 'high', 'open', 'close', 'volume'])
+                        df_cb['time'] = pd.to_datetime(df_cb['time'], unit='s')
+                        df_cb.set_index('time', inplace=True)
+                        df_cb.rename(columns={
+                            'open': 'Open',
+                            'high': 'High',
+                            'low': 'Low',
+                            'close': 'Close',
+                            'volume': 'Volume'
+                        }, inplace=True)
+                        df = df_cb
+            except Exception as cb_err:
+                print(f"Coinbase fallback failed: {cb_err}")
+        
         if df.empty:
             raise ValueError(f"Could not fetch data for {asset} at {interval}. Try using formats like 'BTC-USD' or 'AAPL'.")
             

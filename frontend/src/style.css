@@ -260,6 +260,8 @@ body {
 
 .chart-container {
   flex-grow: 1;
+  height: 100%;
+  min-height: 400px;
   border-radius: var(--radius-md);
   overflow: hidden;
   border: 1px solid var(--border-muted);

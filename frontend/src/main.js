@@ -57,14 +57,16 @@ function switchView(viewName) {
     }
   });
 
-  // Update Page Title
-  const titles = {
-    dashboard: 'Dashboard',
-    journal: 'Trade Journal',
-    library: 'Educational Library',
-    stats: 'Performance Statistics'
-  };
-  viewTitle.textContent = titles[viewName];
+  // Update Page Title if it exists (removed in terminal layout)
+  if (viewTitle) {
+    const titles = {
+      dashboard: 'Dashboard',
+      journal: 'Trade Journal',
+      library: 'Educational Library',
+      stats: 'Performance Statistics'
+    };
+    viewTitle.textContent = titles[viewName];
+  }
 
   // If mobile, close sidebar on nav
   sidebar.classList.remove('active');
